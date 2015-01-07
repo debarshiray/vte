@@ -727,6 +727,8 @@ public:
         std::string m_notification_summary;
         std::string m_notification_body;
 
+        gboolean m_shell_preexec;
+
         std::string m_window_title{};
         std::string m_current_directory_uri{};
         std::string m_current_file_uri{};
