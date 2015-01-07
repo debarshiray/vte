@@ -10723,6 +10723,13 @@ Terminal::emit_pending_signals()
                 m_notification_received = false;
         }
 
+        if (m_shell_preexec) {
+                _vte_debug_print (VTE_DEBUG_SIGNALS,
+                                  "Emitting `shell-preexec'.\n");
+                g_signal_emit(object, signals[SIGNAL_SHELL_PREEXEC], 0);
+                m_shell_preexec = FALSE;
+        }
+
 	if (m_window_title_changed) {
                 if (m_window_title != m_window_title_pending) {
                         m_window_title.swap(m_window_title_pending);
