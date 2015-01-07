@@ -8630,6 +8630,9 @@ VteTerminalPrivate::~VteTerminalPrivate()
 
 	remove_update_timeout(this);
 
+	g_free (m_notification_summary);
+	g_free (m_notification_body);
+
 	/* discard title updates */
         g_free(m_window_title);
         g_free(m_window_title_changed);
@@ -10892,6 +10895,15 @@ VteTerminalPrivate::emit_pending_signals()
         gboolean really_changed;
 
 	emit_adjustment_changed();
+
+	if (m_notification_received) {
+                _vte_debug_print (VTE_DEBUG_SIGNALS,
+                                  "Emitting `notification-received'.\n");
+                g_signal_emit(object, signals[SIGNAL_NOTIFICATION_RECEIVED], 0,
+                              m_notification_summary,
+                              m_notification_body);
+                m_notification_received = FALSE;
+	}
 
 	if (m_window_title_changed) {
                 really_changed = (g_strcmp0(m_window_title, m_window_title_changed) != 0);

@@ -647,6 +647,11 @@ public:
         gboolean m_cursor_moved_pending;
         gboolean m_contents_changed_pending;
 
+	/* desktop notification */
+	gboolean m_notification_received;
+	gchar *m_notification_summary;
+	gchar *m_notification_body;
+
 	/* window name changes */
         char* m_window_title;
         char* m_window_title_changed;

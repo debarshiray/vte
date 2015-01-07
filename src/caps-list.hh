@@ -251,6 +251,8 @@ static const vte_matcher_entry_t entries[] = {
         ENTRY(OSC "119" BEL, reset_highlight_foreground_color),
         ENTRY(OSC "133;%s" BEL, iterm2_133),
         ENTRY(OSC "777;%s" BEL, urxvt_777),
+        ENTRY(OSC "777;%s;%s;%s" BEL, send_notification),
+        ENTRY(OSC "777;%s;%s" BEL, send_notification),
         ENTRY(OSC "1337;%s" BEL, iterm2_1337),
 
         /* Set text parameters, ST_terminated versions. */
@@ -293,6 +295,8 @@ static const vte_matcher_entry_t entries[] = {
         ENTRY(OSC "119" ST, reset_highlight_foreground_color),
         ENTRY(OSC "133;%s" ST, iterm2_133),
         ENTRY(OSC "777;%s" ST, urxvt_777),
+        ENTRY(OSC "777;%s;%s;%s" ST, send_notification),
+        ENTRY(OSC "777;%s;%s" ST, send_notification),
         ENTRY(OSC "1337;%s" ST, iterm2_1337),
 
         /* These may be bogus, I can't find docs for them anywhere (#104154). */
