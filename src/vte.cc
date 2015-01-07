@@ -10100,6 +10100,14 @@ Terminal::emit_pending_signals()
 
 	emit_adjustment_changed();
 
+        if (m_pending_changes & vte::to_integral(PendingChanges::NOTIFICATION)) {
+                _vte_debug_print (VTE_DEBUG_SIGNALS,
+                                  "Emitting `notification-received'.\n");
+                g_signal_emit(freezer.get(), signals[SIGNAL_NOTIFICATION_RECEIVED], 0,
+                              m_notification_summary.c_str(),
+                              m_notification_body.c_str());
+        }
+
 	if (m_pending_changes & vte::to_integral(PendingChanges::TITLE)) {
                 if (m_window_title != m_window_title_pending) {
                         m_window_title.swap(m_window_title_pending);
