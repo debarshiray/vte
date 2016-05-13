@@ -9902,6 +9902,7 @@ void
 Terminal::widget_scroll(GdkEventScroll *event)
 {
 	gdouble delta_x, delta_y;
+	gdouble scroll_speed;
 	gdouble v;
 	gint cnt, i;
 	int button;
@@ -9958,7 +9959,13 @@ Terminal::widget_scroll(GdkEventScroll *event)
 		return;
 	}
 
-	v = MAX (1., ceil (gtk_adjustment_get_page_increment (m_vadjustment) / 10.));
+	if (m_scroll_speed == 0) {
+		scroll_speed = ceil (gtk_adjustment_get_page_increment (m_vadjustment) / 10.);
+	} else {
+		scroll_speed = m_scroll_speed;
+	}
+
+	v = MAX (1., scroll_speed);
 	_vte_debug_print(VTE_DEBUG_EVENTS,
 			"Scroll speed is %d lines per non-smooth scroll unit\n",
 			(int) v);
@@ -10253,6 +10260,16 @@ Terminal::decscusr_cursor_shape()
         case VTE_CURSOR_STYLE_STEADY_IBEAM:
                 return VTE_CURSOR_SHAPE_IBEAM;
         }
+}
+
+bool
+Terminal::set_scroll_speed(unsigned int scroll_speed)
+{
+        if (scroll_speed == m_scroll_speed)
+                return false;
+
+        m_scroll_speed = scroll_speed;
+        return true;
 }
 
 bool
