@@ -474,6 +474,7 @@ public:
 	/* Scrolling options. */
         gboolean m_scroll_on_output;
         gboolean m_scroll_on_keystroke;
+        guint m_scroll_speed;
         vte::grid::row_t m_scrollback_lines;
 
         /* Restricted scrolling */
@@ -1218,6 +1219,7 @@ public:
         bool set_mouse_autohide(bool autohide);
         bool set_pty(VtePty *pty);
         bool set_rewrap_on_resize(bool rewrap);
+        bool set_scroll_speed(unsigned int scroll_speed);
         bool set_scrollback_lines(long lines);
         bool set_scroll_on_keystroke(bool scroll);
         bool set_scroll_on_output(bool scroll);
