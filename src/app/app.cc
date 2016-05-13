@@ -93,6 +93,7 @@ public:
         int verbosity{0};
         double cell_height_scale{1.0};
         double cell_width_scale{1.0};
+        unsigned int scroll_speed{0};
         VteCursorBlinkMode cursor_blink_mode{VTE_CURSOR_BLINK_SYSTEM};
         VteCursorShape cursor_shape{VTE_CURSOR_SHAPE_BLOCK};
         VteTextBlinkMode text_blink_mode{VTE_TEXT_BLINK_ALWAYS};
@@ -405,6 +406,8 @@ public:
                           "Save terminal contents to file at exit", nullptr },
                         { "reverse", 0, 0, G_OPTION_ARG_NONE, &reverse,
                           "Reverse foreground/background colors", nullptr },
+                        { "scroll-speed", 0, 0, G_OPTION_ARG_INT, &scroll_speed,
+                          "Specify the scroll speed", nullptr },
                         { "scrollback-lines", 'n', 0, G_OPTION_ARG_INT, &scrollback_lines,
                           "Specify the number of scrollback-lines (-1 for infinite)", nullptr },
                         { "transparent", 'T', 0, G_OPTION_ARG_INT, &transparency_percent,
@@ -1939,6 +1942,7 @@ vteapp_window_constructed(GObject *object)
         vte_terminal_set_rewrap_on_resize(window->terminal, !options.no_rewrap);
         vte_terminal_set_scroll_on_output(window->terminal, false);
         vte_terminal_set_scroll_on_keystroke(window->terminal, true);
+        vte_terminal_set_scroll_speed(window->terminal, options.scroll_speed);
         vte_terminal_set_scrollback_lines(window->terminal, options.scrollback_lines);
         vte_terminal_set_text_blink_mode(window->terminal, options.text_blink_mode);
 
