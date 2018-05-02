@@ -923,6 +923,7 @@ public:
         std::string m_notification_summary;
         std::string m_notification_body;
 
+        gboolean m_shell_precmd;
         gboolean m_shell_preexec;
 
         std::string m_window_title{};
