@@ -10131,6 +10131,12 @@ Terminal::emit_pending_signals()
                 g_signal_emit(freezer.get(), signals[SIGNAL_SHELL_PREEXEC], 0);
         }
 
+        if (m_pending_changes & vte::to_integral(PendingChanges::SHELL_PRECMD)) {
+                _vte_debug_print (VTE_DEBUG_SIGNALS,
+                                  "Emitting `shell-precmd'.\n");
+                g_signal_emit(freezer.get(), signals[SIGNAL_SHELL_PRECMD], 0);
+        }
+
 	if (m_pending_changes & vte::to_integral(PendingChanges::TITLE)) {
                 if (m_window_title != m_window_title_pending) {
                         m_window_title.swap(m_window_title_pending);
