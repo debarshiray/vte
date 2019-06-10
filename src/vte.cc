@@ -10301,6 +10301,15 @@ Terminal::emit_pending_signals()
                 m_window_title_changed = false;
 	}
 
+        if (m_containers_changed) {
+                _vte_debug_print(VTE_DEBUG_SIGNALS,
+                                 "Notifying `current-container-name' and `current-container-runtime'.\n");
+
+                g_object_notify_by_pspec(object, pspecs[PROP_CURRENT_CONTAINER_NAME]);
+                g_object_notify_by_pspec(object, pspecs[PROP_CURRENT_CONTAINER_RUNTIME]);
+                m_containers_changed = false;
+        }
+
 	if (m_current_directory_uri_changed) {
                 if (m_current_directory_uri != m_current_directory_uri_pending) {
                         m_current_directory_uri.swap(m_current_directory_uri_pending);
