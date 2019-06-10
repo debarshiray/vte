@@ -1343,6 +1343,37 @@ Terminal::handle_urxvt_extension(vte::parser::Sequence const& seq,
                 return;
         }
 
+        if (*token == "container") {
+                ++token;
+
+                if (token == endtoken)
+                        return;
+
+                const std::string sub_command = *token;
+                ++token;
+
+                if (sub_command == "pop") {
+                        if (!m_containers.empty()) {
+                                m_containers.pop();
+                                m_containers_changed = true;
+                        }
+                } else if (sub_command == "push") {
+                        if (token == endtoken)
+                                return;
+
+                        const std::string name = *token;
+                        ++token;
+
+                        if (token == endtoken)
+                                return;
+
+                        const std::string runtime = *token;
+
+                        m_containers.emplace(name, runtime);
+                        m_containers_changed = true;
+                }
+        }
+
         if (*token == "notify") {
                 ++token;
 
