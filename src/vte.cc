@@ -10150,6 +10150,14 @@ Terminal::emit_pending_signals()
                 m_window_title_pending.clear();
 	}
 
+	if (m_pending_changes & vte::to_integral(PendingChanges::CONTAINERS)) {
+                _vte_debug_print(VTE_DEBUG_SIGNALS,
+                                 "Notifying `current-container-name' and `current-container-runtime'.\n");
+
+                g_object_notify_by_pspec(freezer.get(), pspecs[PROP_CURRENT_CONTAINER_NAME]);
+                g_object_notify_by_pspec(freezer.get(), pspecs[PROP_CURRENT_CONTAINER_RUNTIME]);
+        }
+
 	if (m_pending_changes & vte::to_integral(PendingChanges::CWD)) {
                 if (m_current_directory_uri != m_current_directory_uri_pending) {
                         m_current_directory_uri.swap(m_current_directory_uri_pending);
