@@ -73,7 +73,8 @@
 #define VTE_TERMINAL_CSS_NAME "vte-terminal"
 
 struct _VteTerminalClassPrivate {
-        GtkStyleProvider *style_provider;
+        GtkStyleProvider *style_provider_dark;
+        GtkStyleProvider *style_provider_light;
 };
 
 #ifdef VTE_DEBUG
@@ -125,6 +126,41 @@ valid_color(GdkRGBA const* color)
                color->green >= 0. && color->green <= 1. &&
                color->blue >= 0. && color->blue <= 1. &&
                color->alpha >= 0. && color->alpha <= 1.;
+}
+
+static void
+vte_terminal_theme_update (VteTerminal *terminal)
+{
+        GtkSettings *settings;
+        GtkStyleContext *context;
+        gboolean application_prefer_dark_theme;
+
+        settings = gtk_settings_get_default ();
+        g_object_get (settings, "gtk-application-prefer-dark-theme", &application_prefer_dark_theme, nullptr);
+
+        context = gtk_widget_get_style_context (&terminal->widget);
+
+        if (application_prefer_dark_theme) {
+                gtk_style_context_remove_provider (context,
+                                                   VTE_TERMINAL_GET_CLASS (terminal)->priv->style_provider_light);
+
+                gtk_style_context_add_provider (context,
+                                                VTE_TERMINAL_GET_CLASS (terminal)->priv->style_provider_dark,
+                                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        } else {
+                gtk_style_context_remove_provider (context,
+                                                   VTE_TERMINAL_GET_CLASS (terminal)->priv->style_provider_dark);
+
+                gtk_style_context_add_provider (context,
+                                                VTE_TERMINAL_GET_CLASS (terminal)->priv->style_provider_light,
+                                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        }
+}
+
+static void
+vte_terminal_theme_changed (VteTerminal *terminal)
+{
+        vte_terminal_theme_update (terminal);
 }
 
 static void
@@ -392,14 +428,18 @@ static void
 vte_terminal_init(VteTerminal *terminal)
 {
         void *place;
-	GtkStyleContext *context;
+        GtkSettings *settings;
 
 	_vte_debug_print(VTE_DEBUG_LIFECYCLE, "vte_terminal_init()\n");
 
-        context = gtk_widget_get_style_context(&terminal->widget);
-        gtk_style_context_add_provider (context,
-                                        VTE_TERMINAL_GET_CLASS (terminal)->priv->style_provider,
-                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        vte_terminal_theme_update (terminal);
+
+        settings = gtk_settings_get_default ();
+        g_signal_connect_object (settings,
+                                 "notify::gtk-application-prefer-dark-theme",
+                                 G_CALLBACK (vte_terminal_theme_changed),
+                                 terminal,
+                                 G_CONNECT_SWAPPED);
 
 	/* Initialize private data. NOTE: place is zeroed */
 	place = vte_terminal_get_instance_private(terminal);
@@ -1917,11 +1957,20 @@ vte_terminal_class_init(VteTerminalClass *klass)
 
         klass->priv = G_TYPE_CLASS_GET_PRIVATE (klass, VTE_TYPE_TERMINAL, VteTerminalClassPrivate);
 
-        klass->priv->style_provider = GTK_STYLE_PROVIDER (gtk_css_provider_new ());
-        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (klass->priv->style_provider),
+        klass->priv->style_provider_dark = GTK_STYLE_PROVIDER (gtk_css_provider_new ());
+        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (klass->priv->style_provider_dark),
                                          "VteTerminal, " VTE_TERMINAL_CSS_NAME " {\n"
                                          "padding: 1px 1px 1px 1px;\n"
-                                         "background-color: @theme_base_color;\n"
+                                         "background-color: shade(@theme_base_color, 0.67);\n"
+                                         "color: @theme_text_color;\n"
+                                         "}\n",
+                                         -1, NULL);
+
+        klass->priv->style_provider_light = GTK_STYLE_PROVIDER (gtk_css_provider_new ());
+        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (klass->priv->style_provider_light),
+                                         "VteTerminal, " VTE_TERMINAL_CSS_NAME " {\n"
+                                         "padding: 1px 1px 1px 1px;\n"
+                                         "background-color: shade(@theme_base_color, 1.1);\n"
                                          "color: @theme_text_color;\n"
                                          "}\n",
                                          -1, NULL);
